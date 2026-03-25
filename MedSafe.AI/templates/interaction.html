@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Drug Interaction Checker — MedSafe AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#060d1a;--sidebar:#080f1e;--border:rgba(255,255,255,0.07);--accent:#00b4d8;--accent2:#0077b6;--text:#d0e8f0;--muted:#3a6070;--card:rgba(255,255,255,0.03)}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;overflow:hidden}
+    .sidebar{width:260px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+    .sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+    .logo-box{width:40px;height:40px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 20px rgba(0,180,216,0.3);flex-shrink:0}
+    .logo-text h2{font-size:1rem;font-weight:700;color:#fff}.logo-text p{font-size:0.7rem;color:var(--muted);margin-top:1px}
+    .sidebar-section{padding:16px 12px 8px;font-size:0.68rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px}
+    .quick-list{padding:0 12px;display:flex;flex-direction:column;gap:4px;flex:1;overflow-y:auto}
+    .quick-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:0.82rem;color:#6a9aaa;transition:all 0.15s;border:1px solid transparent;text-decoration:none}
+    .quick-item:hover,.quick-item.active{background:rgba(0,180,216,0.07);border-color:rgba(0,180,216,0.15);color:var(--accent)}
+    .sidebar-bottom{padding:16px 12px;border-top:1px solid var(--border)}
+    .user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px}
+    .user-avatar{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+    .user-info p{font-size:0.82rem;font-weight:600;color:#c0dde8}.user-info span{font-size:0.7rem;color:var(--muted)}
+    .btn-logout{width:100%;background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);border-radius:10px;padding:9px;color:#e07070;font-size:0.8rem;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.2s}
+    .btn-logout:hover{background:rgba(231,76,60,0.15)}
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .topbar{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(6,13,26,0.8);backdrop-filter:blur(10px)}
+    .topbar-left h3{font-size:1rem;font-weight:600;color:#e0f0f5}.topbar-left p{font-size:0.75rem;color:var(--muted);margin-top:2px}
+    .content{flex:1;overflow-y:auto;padding:28px;display:flex;flex-direction:column;gap:20px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px}
+    .card h3{font-size:1rem;font-weight:600;color:#e0f0f5;margin-bottom:6px}
+    .card p.sub{font-size:0.8rem;color:var(--muted);margin-bottom:18px}
+    label{display:block;font-size:0.78rem;font-weight:500;color:#7ab8c8;margin-bottom:6px}
+    textarea,input[type=text]{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:0.88rem;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s;resize:vertical}
+    textarea:focus,input[type=text]:focus{border-color:var(--accent)}
+    textarea::placeholder,input::placeholder{color:#2a4a5a}
+    .btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;padding:11px 24px;color:#fff;font-size:0.88rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.2s;margin-top:14px}
+    .btn:hover{opacity:0.85;transform:translateY(-1px)}.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+    .result-box{background:rgba(0,180,216,0.04);border:1px solid rgba(0,180,216,0.15);border-radius:14px;padding:20px;margin-top:4px}
+    .med-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(0,180,216,0.1);border:1px solid rgba(0,180,216,0.2);border-radius:20px;padding:4px 12px;font-size:0.78rem;color:#7ecfcf;margin:3px}
+    .interaction-row{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:10px;margin-bottom:8px}
+    .interaction-row.HIGH{background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.25)}
+    .interaction-row.MODERATE{background:rgba(240,192,96,0.08);border:1px solid rgba(240,192,96,0.2)}
+    .interaction-row.LOW{background:rgba(74,170,112,0.08);border:1px solid rgba(74,170,112,0.2)}
+    .sev-badge{font-size:0.7rem;font-weight:700;padding:3px 8px;border-radius:6px;flex-shrink:0;margin-top:2px}
+    .sev-badge.HIGH{background:rgba(231,76,60,0.2);color:#ff8080}
+    .sev-badge.MODERATE{background:rgba(240,192,96,0.2);color:#f0c060}
+    .sev-badge.LOW{background:rgba(74,170,112,0.2);color:#7adb9a}
+    .ai-note{background:rgba(0,119,182,0.08);border:1px solid rgba(0,119,182,0.2);border-radius:12px;padding:16px;margin-top:14px;font-size:0.85rem;line-height:1.7;color:#c0dde8}
+    .ai-note strong{color:#7ecfcf}
+    .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(0,180,216,0.3);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:8px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .content::-webkit-scrollbar{width:4px}.content::-webkit-scrollbar-thumb{background:#1a3a4a;border-radius:4px}
+    .no-interaction{color:#4aaa70;font-size:0.85rem;padding:10px 0}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-box">🛡️</div>
+    <div class="logo-text"><h2>MedSafe AI</h2><p>Medical Assistant</p></div>
+  </div>
+  <div class="sidebar-section">Modules</div>
+  <div class="quick-list">
+    <a class="quick-item" href="/dashboard"><span>💬</span> AI Chat Assistant</a>
+    <a class="quick-item active" href="/interaction"><span>⚗️</span> Drug Interaction Checker</a>
+    <a class="quick-item" href="/prescription"><span>📋</span> Prescription Reader</a>
+    <a class="quick-item" href="/sideeffects"><span>📝</span> Side-Effect Monitor</a>
+    <a class="quick-item" href="/symptoms"><span>🔬</span> Symptom & Risk Checker</a>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">👤</div>
+      <div class="user-info"><p>{{ username }}</p><span>Active Session</span></div>
+    </div>
+    <button class="btn-logout" onclick="window.location='/logout'">⬅ Sign Out</button>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h3>⚗️ Drug Interaction Checker</h3>
+      <p>Enter multiple medicines to check for known interactions and get an AI safety summary</p>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <h3>Enter Medicines</h3>
+      <p class="sub">Enter medicine names separated by commas or new lines (e.g. Warfarin, Aspirin, Ibuprofen)</p>
+      <label>Medicine Names</label>
+      <textarea id="med-input" rows="4" placeholder="e.g. Warfarin, Aspirin, Metformin, Omeprazole"></textarea>
+      <button class="btn" id="check-btn" onclick="checkInteraction()">Check Interactions</button>
+    </div>
+
+    <div id="result-area" style="display:none">
+      <div class="card">
+        <h3>Matched Medicines</h3>
+        <div id="matched-meds"></div>
+      </div>
+      <div class="card" style="margin-top:0">
+        <h3>Interaction Results</h3>
+        <div id="interaction-results"></div>
+        <div class="ai-note" id="ai-note" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+async function checkInteraction() {
+  const input = document.getElementById('med-input').value.trim();
+  if (!input) return;
+  const btn = document.getElementById('check-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Checking...';
+
+  const res = await fetch('/api/interaction', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({medicines: input})
+  });
+  const data = await res.json();
+  btn.disabled = false;
+  btn.innerHTML = 'Check Interactions';
+
+  if (data.error) { alert(data.error); return; }
+
+  // Matched meds
+  const matchedDiv = document.getElementById('matched-meds');
+  matchedDiv.innerHTML = data.matched.map(m =>
+    `<span class="med-tag">💊 ${m.input} → <strong>${m.matched}</strong> (${m.info?.salt || ''})</span>`
+  ).join('');
+
+  // Interactions
+  const intDiv = document.getElementById('interaction-results');
+  if (data.interactions.length === 0) {
+    intDiv.innerHTML = '<p class="no-interaction">✅ No known interactions found between these medicines in our database.</p>';
+  } else {
+    intDiv.innerHTML = data.interactions.map(i => `
+      <div class="interaction-row ${i.severity}">
+        <span class="sev-badge ${i.severity}">${i.severity}</span>
+        <div>
+          <strong style="color:#e0f0f5">${i.drug1}</strong> + <strong style="color:#e0f0f5">${i.drug2}</strong>
+          <div style="font-size:0.82rem;color:#8aabb8;margin-top:3px">${i.note}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  // AI note
+  const aiDiv = document.getElementById('ai-note');
+  aiDiv.style.display = 'block';
+  aiDiv.innerHTML = '🤖 <strong>AI Safety Summary:</strong><br>' + formatText(data.ai_note);
+
+  document.getElementById('result-area').style.display = 'block';
+}
+
+function formatText(t) {
+  return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');
+}
+</script>
+</body>
+</html>

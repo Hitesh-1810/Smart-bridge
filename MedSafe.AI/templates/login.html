@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MedSafe AI — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      background: #060d1a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Animated background */
+    .bg-orbs {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.15;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .orb1 { width: 500px; height: 500px; background: #00b4d8; top: -150px; left: -150px; animation-delay: 0s; }
+    .orb2 { width: 400px; height: 400px; background: #0077b6; bottom: -100px; right: -100px; animation-delay: 3s; }
+    .orb3 { width: 300px; height: 300px; background: #48cae4; top: 50%; left: 50%; animation-delay: 1.5s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.05); }
+    }
+
+    /* Grid lines */
+    .grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,180,216,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,180,216,0.04) 1px, transparent 1px);
+      background-size: 50px 50px;
+      z-index: 0;
+    }
+
+    .login-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 440px;
+      padding: 20px;
+    }
+
+    /* Logo */
+    .logo-section {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo-circle {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, #00b4d8, #0077b6);
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin-bottom: 16px;
+      box-shadow: 0 0 40px rgba(0,180,216,0.4);
+    }
+
+    .logo-section h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-section p {
+      color: #4a7a8a;
+      font-size: 0.85rem;
+      margin-top: 4px;
+    }
+
+    /* Card */
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 36px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    }
+
+    .card h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #e0f0f5;
+      margin-bottom: 6px;
+    }
+
+    .card p {
+      font-size: 0.82rem;
+      color: #4a7a8a;
+      margin-bottom: 28px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #7ab8c8;
+      margin-bottom: 8px;
+      letter-spacing: 0.3px;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      opacity: 0.5;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 13px 14px 13px 42px;
+      color: #e0f0f5;
+      font-size: 0.92rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    input:focus {
+      border-color: #00b4d8;
+      background: rgba(0,180,216,0.06);
+      box-shadow: 0 0 0 3px rgba(0,180,216,0.1);
+    }
+
+    input::placeholder { color: #2a4a5a; }
+
+    .toggle-pw {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 16px;
+      opacity: 0.4;
+      transition: opacity 0.2s;
+      background: none;
+      border: none;
+      color: #fff;
+    }
+
+    .toggle-pw:hover { opacity: 0.8; }
+
+    .error-msg {
+      background: rgba(231,76,60,0.12);
+      border: 1px solid rgba(231,76,60,0.3);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #ff8080;
+      font-size: 0.82rem;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-login {
+      width: 100%;
+      background: linear-gradient(135deg, #00b4d8, #0077b6);
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 8px;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 25px rgba(0,180,216,0.35);
+    }
+
+    .btn-login:active { transform: translateY(0); }
+
+    .demo-creds {
+      margin-top: 24px;
+      background: rgba(0,180,216,0.05);
+      border: 1px solid rgba(0,180,216,0.12);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .demo-creds p {
+      font-size: 0.75rem;
+      color: #4a7a8a;
+      margin-bottom: 8px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .cred-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #7ab8c8;
+      padding: 3px 0;
+    }
+
+    .cred-row span:last-child { color: #4a7a8a; }
+
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+      margin: 20px 0;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 0.72rem;
+      color: #2a4a5a;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+<div class="grid"></div>
+
+<div class="login-wrapper">
+  <div class="logo-section">
+    <div class="logo-circle">🛡️</div>
+    <h1>MedSafe AI</h1>
+    <p>AI-Driven Medical Safety Assistant</p>
+  </div>
+
+  <div class="card">
+    <h2>Welcome back</h2>
+    <p>Sign in to access your medical assistant</p>
+
+    {% if error %}
+    <div class="error-msg">⚠️ {{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+      <div class="form-group">
+        <label>Username</label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input type="text" name="username" placeholder="Enter your username" required autocomplete="off"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input type="password" name="password" id="pw" placeholder="Enter your password" required/>
+          <button type="button" class="toggle-pw" onclick="togglePw()">👁️</button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-login">Sign In →</button>
+    </form>
+
+    <div class="divider"></div>
+
+    <div class="demo-creds">
+      <p>Demo Credentials</p>
+      <div class="cred-row"><span>admin</span><span>medsafe123</span></div>
+      <div class="cred-row"><span>doctor</span><span>health2024</span></div>
+      <div class="cred-row"><span>user</span><span>password</span></div>
+    </div>
+  </div>
+
+  <p class="footer-note">⚕ For informational purposes only. Not a substitute for professional medical advice.</p>
+</div>
+
+<script>
+  function togglePw() {
+    const pw = document.getElementById('pw');
+    pw.type = pw.type === 'password' ? 'text' : 'password';
+  }
+</script>
+</body>
+</html>

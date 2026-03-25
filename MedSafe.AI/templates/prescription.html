@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Prescription Reader — MedSafe AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#060d1a;--sidebar:#080f1e;--border:rgba(255,255,255,0.07);--accent:#00b4d8;--accent2:#0077b6;--text:#d0e8f0;--muted:#3a6070;--card:rgba(255,255,255,0.03)}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;overflow:hidden}
+    .sidebar{width:260px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+    .sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+    .logo-box{width:40px;height:40px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 20px rgba(0,180,216,0.3);flex-shrink:0}
+    .logo-text h2{font-size:1rem;font-weight:700;color:#fff}.logo-text p{font-size:0.7rem;color:var(--muted);margin-top:1px}
+    .sidebar-section{padding:16px 12px 8px;font-size:0.68rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px}
+    .quick-list{padding:0 12px;display:flex;flex-direction:column;gap:4px;flex:1;overflow-y:auto}
+    .quick-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:0.82rem;color:#6a9aaa;transition:all 0.15s;border:1px solid transparent;text-decoration:none}
+    .quick-item:hover,.quick-item.active{background:rgba(0,180,216,0.07);border-color:rgba(0,180,216,0.15);color:var(--accent)}
+    .sidebar-bottom{padding:16px 12px;border-top:1px solid var(--border)}
+    .user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px}
+    .user-avatar{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+    .user-info p{font-size:0.82rem;font-weight:600;color:#c0dde8}.user-info span{font-size:0.7rem;color:var(--muted)}
+    .btn-logout{width:100%;background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);border-radius:10px;padding:9px;color:#e07070;font-size:0.8rem;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.2s}
+    .btn-logout:hover{background:rgba(231,76,60,0.15)}
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .topbar{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(6,13,26,0.8);backdrop-filter:blur(10px)}
+    .topbar-left h3{font-size:1rem;font-weight:600;color:#e0f0f5}.topbar-left p{font-size:0.75rem;color:var(--muted);margin-top:2px}
+    .content{flex:1;overflow-y:auto;padding:28px;display:flex;flex-direction:column;gap:20px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px}
+    .card h3{font-size:1rem;font-weight:600;color:#e0f0f5;margin-bottom:6px}
+    .card p.sub{font-size:0.8rem;color:var(--muted);margin-bottom:18px}
+    .upload-zone{border:2px dashed rgba(0,180,216,0.3);border-radius:14px;padding:40px;text-align:center;cursor:pointer;transition:all 0.2s;background:rgba(0,180,216,0.02)}
+    .upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(0,180,216,0.06)}
+    .upload-zone .icon{font-size:2.5rem;margin-bottom:10px}
+    .upload-zone p{color:var(--muted);font-size:0.85rem}
+    .upload-zone strong{color:var(--accent)}
+    #file-input{display:none}
+    #preview-img{max-width:100%;max-height:280px;border-radius:10px;margin-top:14px;display:none;border:1px solid var(--border)}
+    .btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;padding:11px 24px;color:#fff;font-size:0.88rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.2s;margin-top:14px}
+    .btn:hover{opacity:0.85;transform:translateY(-1px)}.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+    .med-card{background:rgba(0,180,216,0.04);border:1px solid rgba(0,180,216,0.15);border-radius:12px;padding:16px;margin-bottom:10px}
+    .med-card h4{color:#7ecfcf;font-size:0.9rem;margin-bottom:8px}
+    .med-row{display:flex;gap:8px;margin-bottom:4px;font-size:0.82rem}
+    .med-label{color:var(--muted);min-width:90px;flex-shrink:0}
+    .med-val{color:#c0dde8}
+    .db-match{display:inline-block;background:rgba(74,170,112,0.1);border:1px solid rgba(74,170,112,0.2);border-radius:6px;padding:2px 8px;font-size:0.72rem;color:#7adb9a;margin-top:4px}
+    .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(0,180,216,0.3);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:8px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .content::-webkit-scrollbar{width:4px}.content::-webkit-scrollbar-thumb{background:#1a3a4a;border-radius:4px}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-box">🛡️</div>
+    <div class="logo-text"><h2>MedSafe AI</h2><p>Medical Assistant</p></div>
+  </div>
+  <div class="sidebar-section">Modules</div>
+  <div class="quick-list">
+    <a class="quick-item" href="/dashboard"><span>💬</span> AI Chat Assistant</a>
+    <a class="quick-item" href="/interaction"><span>⚗️</span> Drug Interaction Checker</a>
+    <a class="quick-item active" href="/prescription"><span>📋</span> Prescription Reader</a>
+    <a class="quick-item" href="/sideeffects"><span>📝</span> Side-Effect Monitor</a>
+    <a class="quick-item" href="/symptoms"><span>🔬</span> Symptom & Risk Checker</a>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">👤</div>
+      <div class="user-info"><p>{{ username }}</p><span>Active Session</span></div>
+    </div>
+    <button class="btn-logout" onclick="window.location='/logout'">⬅ Sign Out</button>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h3>📋 Prescription Reader</h3>
+      <p>Upload a prescription image — AI will extract medicine names, salts, dosage and frequency</p>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <h3>Upload Prescription Image</h3>
+      <p class="sub">Supports JPG, PNG, WEBP. The AI will read and extract all medicine details.</p>
+      <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
+           ondragover="event.preventDefault();this.classList.add('drag')"
+           ondragleave="this.classList.remove('drag')"
+           ondrop="handleDrop(event)">
+        <div class="icon">📄</div>
+        <p><strong>Click to upload</strong> or drag & drop your prescription here</p>
+        <p style="margin-top:6px;font-size:0.75rem">JPG, PNG, WEBP supported</p>
+      </div>
+      <input type="file" id="file-input" accept="image/*" onchange="previewFile(event)"/>
+      <img id="preview-img" alt="Prescription preview"/>
+      <button class="btn" id="read-btn" onclick="readPrescription()" style="display:none">🔍 Read Prescription</button>
+    </div>
+
+    <div id="result-area" style="display:none">
+      <div class="card">
+        <h3>Extracted Medicines</h3>
+        <p class="sub">Medicines identified from your prescription with active ingredients and dosage details.</p>
+        <div id="med-results"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedFile = null;
+
+function previewFile(e) {
+  selectedFile = e.target.files[0];
+  if (!selectedFile) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = document.getElementById('preview-img');
+    img.src = ev.target.result;
+    img.style.display = 'block';
+    document.getElementById('read-btn').style.display = 'inline-block';
+  };
+  reader.readAsDataURL(selectedFile);
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = document.getElementById('preview-img');
+      img.src = ev.target.result;
+      img.style.display = 'block';
+      document.getElementById('read-btn').style.display = 'inline-block';
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+async function readPrescription() {
+  if (!selectedFile) return;
+  const btn = document.getElementById('read-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Reading...';
+
+  const formData = new FormData();
+  formData.append('file', selectedFile);
+
+  const res = await fetch('/api/prescription', { method: 'POST', body: formData });
+  const data = await res.json();
+  btn.disabled = false;
+  btn.innerHTML = '🔍 Read Prescription';
+
+  if (data.error) { alert(data.error); return; }
+
+  const div = document.getElementById('med-results');
+  if (!data.medicines || data.medicines.length === 0) {
+    div.innerHTML = '<p style="color:var(--muted)">No medicines could be extracted. Try a clearer image.</p>';
+  } else {
+    div.innerHTML = data.medicines.map((m, i) => `
+      <div class="med-card">
+        <h4>💊 Medicine ${i+1}: ${m.medicine}</h4>
+        <div class="med-row"><span class="med-label">Active Salt:</span><span class="med-val">${m.salt || '—'}</span></div>
+        <div class="med-row"><span class="med-label">Dosage:</span><span class="med-val">${m.dosage || '—'}</span></div>
+        <div class="med-row"><span class="med-label">Frequency:</span><span class="med-val">${m.frequency || '—'}</span></div>
+        ${m.db_match ? `<span class="db-match">✓ Matched in DB: ${m.db_match} — ${m.db_info?.category || ''}</span>` : ''}
+      </div>`).join('');
+  }
+  document.getElementById('result-area').style.display = 'block';
+}
+</script>
+</body>
+</html>

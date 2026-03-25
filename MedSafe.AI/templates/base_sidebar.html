@@ -1,0 +1,39 @@
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-box">🛡️</div>
+    <div class="logo-text">
+      <h2>MedSafe AI</h2>
+      <p>Medical Assistant</p>
+    </div>
+  </div>
+
+  <div class="sidebar-section">Modules</div>
+  <div class="quick-list">
+    <a class="quick-item {% if active=='chat' %}active{% endif %}" href="/dashboard">
+      <span class="icon">💬</span> AI Chat Assistant
+    </a>
+    <a class="quick-item {% if active=='interaction' %}active{% endif %}" href="/interaction">
+      <span class="icon">⚗️</span> Drug Interaction Checker
+    </a>
+    <a class="quick-item {% if active=='prescription' %}active{% endif %}" href="/prescription">
+      <span class="icon">📋</span> Prescription Reader
+    </a>
+    <a class="quick-item {% if active=='sideeffects' %}active{% endif %}" href="/sideeffects">
+      <span class="icon">📝</span> Side-Effect Monitor
+    </a>
+    <a class="quick-item {% if active=='symptoms' %}active{% endif %}" href="/symptoms">
+      <span class="icon">🔬</span> Symptom & Risk Checker
+    </a>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">👤</div>
+      <div class="user-info">
+        <p>{{ username }}</p>
+        <span>Active Session</span>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="window.location='/logout'">⬅ Sign Out</button>
+  </div>
+</aside>
